@@ -30,12 +30,16 @@ const LoanCalculator = () => {
   };
 
   const handleLoanAmountChange = (e) => {
-    const rawValue = unformatCurrency(e.target.value);
-    const formattedValue = formatToCurrency(rawValue);
-    
-    setDisplayLoanAmount(formattedValue);
-    setLoanAmount(rawValue);
-  };
+  const rawValue = unformatCurrency(e.target.value);
+  const formattedValue = formatToCurrency(rawValue);
+
+  setDisplayLoanAmount(formattedValue);
+  setLoanAmount(rawValue);
+
+  const downPaymentValue = (rawValue * 0.3).toFixed(0);
+  setDownPayment(downPaymentValue);
+  setDisplayDownPayment(formatToCurrency(downPaymentValue));
+};
 
   const handleDownPaymentChange = (e) => {
   const rawValue = unformatCurrency(e.target.value);
