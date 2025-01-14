@@ -2,12 +2,51 @@ import { useState } from 'react';
 
 const LoanCalculator = () => {
   const [loanAmount, setLoanAmount] = useState('');
+  const [displayLoanAmount, setDisplayLoanAmount] = useState('');
   const [interestRate, setInterestRate] = useState('');
   const [loanTerm, setLoanTerm] = useState('');
   const [results, setResults] = useState(null);
+  const [downPayment, setDownPayment] = useState('');
+  const [displayDownPayment, setDisplayDownPayment] = useState('');
+
+  // Função para formatar número para moeda brasileira
+  const formatToCurrency = (value) => {
+    const numericValue = value.replace(/\D/g, '');
+    const floatValue = parseFloat(numericValue) / 100;
+    
+    if (isNaN(floatValue)) {
+      return '';
+    }
+
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(floatValue);
+  };
+
+  // Função para limpar formatação e retornar apenas números
+  const unformatCurrency = (value) => {
+    return value.replace(/\D/g, '') || '0';
+  };
+
+  const handleLoanAmountChange = (e) => {
+    const rawValue = unformatCurrency(e.target.value);
+    const formattedValue = formatToCurrency(rawValue);
+    
+    setDisplayLoanAmount(formattedValue);
+    setLoanAmount(rawValue);
+  };
+
+  const handleDownPaymentChange = (e) => {
+  const rawValue = unformatCurrency(e.target.value);
+  const formattedValue = formatToCurrency(rawValue);
+  
+  setDisplayDownPayment(formattedValue);
+  setDownPayment(rawValue);
+};
 
   const calculateLoan = () => {
-    const principal = parseFloat(loanAmount);
+    const principal = (parseFloat(loanAmount) - parseFloat(downPayment || 0)) / 100;
     const annualRate = parseFloat(interestRate);
     const years = parseFloat(loanTerm);
 
@@ -43,30 +82,52 @@ const LoanCalculator = () => {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Valor do Imóvel (R$)
+            Valor do Imóvel
           </label>
           <input
-            type="number"
-            value={loanAmount}
-            onChange={(e) => setLoanAmount(e.target.value)}
+            type="text"
+            value={displayLoanAmount}
+            onChange={handleLoanAmountChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Ex: 300000"
+            placeholder="R$ 0,00"
           />
         </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Valor da Entrada
+        </label>
+        <input
+          type="text"
+          value={displayDownPayment}
+          onChange={handleDownPaymentChange}
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="R$ 0,00"
+        />
+      </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Taxa de Juros Anual (%)
-          </label>
-          <input
-            type="number"
-            value={interestRate}
-            onChange={(e) => setInterestRate(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Ex: 8.5"
-            step="0.1"
-          />
+      <div className="flex items-center gap-2 mb-1">
+        <label className="block text-sm font-medium text-gray-700">
+          Taxa de Juros Anual (%)
+        </label>
+        <div className="relative group">
+          <span className="cursor-help text-gray-400">ℹ️</span>
+          <div className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded p-2  w-64"
+            style={{ top: "-30px", left: "25px" }}
+          >
+            Taxa média de juros imobiliário no Brasil - Jan/2025 - 11%
+          </div>
         </div>
+      </div>
+      <input
+        type="number"
+        value={interestRate}
+        onChange={(e) => setInterestRate(e.target.value)}
+        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        placeholder="Ex: 8.5"
+        step="0.1"
+      />
+      </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -93,16 +154,21 @@ const LoanCalculator = () => {
         <div className="mt-6 p-4 bg-gray-50 rounded-md space-y-2">
           <h3 className="font-semibold text-lg mb-3">Resultados da Simulação</h3>
           <p>
-            Prestação Mensal: R$ {results.monthlyPayment.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            Prestação Mensal: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(results.monthlyPayment)}
           </p>
           <p>
-            Valor Total do Financiamento: R$ {results.totalPayment.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            Valor Total do Financiamento: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(results.totalPayment)}
           </p>
           <p>
-            Total de Juros: R$ {results.totalInterest.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            Total de Juros: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(results.totalInterest)}
           </p>
           <p>
-            Valor Financiado: R$ {results.principal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            Valor Financiado: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(results.principal)}
+          </p>
+          <p>
+            Valor da Entrada: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(downPayment)/100)}
+            {' '}
+            ({((parseFloat(downPayment) / parseFloat(loanAmount)) * 100).toFixed(1)}%)
           </p>
         </div>
       )}
