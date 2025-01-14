@@ -98,17 +98,28 @@ const LoanCalculator = () => {
         </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Valor da Entrada
-        </label>
-        <input
-          type="text"
-          value={displayDownPayment}
-          onChange={handleDownPaymentChange}
-          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="R$ 0,00"
-        />
+  <div className="flex items-center gap-2 mb-1">
+    <label className="block text-sm font-medium text-gray-700">
+      Valor da Entrada
+    </label>
+    <div className="relative group">
+      <span className="cursor-help text-gray-400">ℹ️</span>
+      <div
+        className="absolute hidden group-hover:block bg-gray-800 text-white text-xs rounded p-2 w-64"
+        style={{ top: "-30px", left: "25px" }}
+      >
+        O valor da entrada é definido como 30% do valor do imóvel no Brasil.
       </div>
+    </div>
+  </div>
+  <input
+    type="text"
+    value={displayDownPayment}
+    onChange={handleDownPaymentChange}
+    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+    placeholder="R$ 0,00"
+  />
+</div>
         <div>
       <div className="flex items-center gap-2 mb-1">
         <label className="block text-sm font-medium text-gray-700">
